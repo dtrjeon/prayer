@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -131,18 +131,18 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 
 /* 필터바 */
 .filter-bar{background:white;border:1px solid var(--border);border-radius:var(--radius);
-  padding:12px 14px;margin-bottom:12px;}
-.filter-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
-.filter-row:last-child{margin-bottom:0;}
-.filter-label{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap;width:36px;}
-.filter-chips{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
-.chip{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;
-  border:1.5px solid var(--border);background:white;color:var(--muted);
-  font-family:'Noto Sans KR',sans-serif;touch-action:manipulation;transition:all 0.12s;}
-.chip.active{background:var(--olive);border-color:var(--olive);color:white;}
-.search-input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:20px;
-  font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--ink);
-  outline:none;-webkit-appearance:none;background:white;}
+  padding:10px 12px;margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.filter-select-wrap{position:relative;flex:1;min-width:100px;}
+.filter-select-wrap::after{content:'▾';position:absolute;right:10px;top:50%;
+  transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:12px;}
+.filter-select{width:100%;padding:9px 28px 9px 10px;border:1.5px solid var(--border);
+  border-radius:var(--radius);font-family:'Noto Sans KR',sans-serif;font-size:13px;
+  color:var(--ink);background:white;outline:none;-webkit-appearance:none;appearance:none;
+  cursor:pointer;}
+.filter-select:focus{border-color:var(--olive-light);}
+.search-input{flex:2;min-width:100px;padding:9px 12px;border:1.5px solid var(--border);
+  border-radius:var(--radius);font-family:'Noto Sans KR',sans-serif;font-size:13px;
+  color:var(--ink);outline:none;-webkit-appearance:none;background:white;}
 .search-input:focus{border-color:var(--olive-light);}
 
 /* 조회 컨트롤 */
@@ -206,6 +206,15 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 .edit-actions{display:flex;gap:8px;padding:4px 0 2px;}
 .edit-actions .btn{min-height:42px;font-size:13px;padding:10px 14px;}
 
+/* 수정 안내 메시지 */
+.edit-guide{padding:12px 14px;background:#fffbf0;border-top:1px solid var(--gold-border);
+  display:flex;flex-direction:column;gap:4px;}
+.edit-guide-title{font-size:13px;font-weight:600;color:var(--gold);}
+.edit-guide-desc{font-size:12px;color:var(--muted);line-height:1.7;}
+.edit-guide-example{font-size:12px;color:#bbb;font-style:italic;}
+.edit-guide-close{align-self:flex-end;font-size:11px;color:var(--muted);
+  background:none;border:none;cursor:pointer;padding:2px 6px;margin-top:2px;}
+
 /* 인증 모달 */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
   z-index:300;align-items:center;justify-content:center;}
@@ -232,20 +241,50 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
   background:var(--parchment);font-weight:500;color:var(--muted);line-height:1.4;white-space:pre-line;}
 .agg-table th.sunday{color:var(--red);background:#fdf0f0;}
 .agg-table th.saturday{color:var(--blue);background:#f0f4fd;}
-.agg-table td{text-align:center;padding:7px 1px;border:1px solid var(--border);
-  background:white;font-size:12px;font-weight:500;}
+.agg-table td{text-align:center;padding:5px 2px;border:1px solid var(--border);
+  background:white;font-size:10px;font-weight:400;vertical-align:top;line-height:1.5;}
 .agg-table td.meal-lbl{font-size:11px;color:var(--muted);background:var(--parchment);
-  white-space:pre-line;border:none;}
-.agg-table td.zero{color:#ccc;}
-.agg-table td.cnt1{background:#f0f5e8;color:var(--olive);}
-.agg-table td.cnt2{background:#d8eabb;color:#3a4e1a;}
-.agg-table td.cnt3{background:#b8d98a;color:#2a3a10;font-weight:700;}
-.agg-table td.cnt4plus{background:#8fbb4a;color:white;font-weight:700;}
+  white-space:pre-line;border:none;font-weight:500;vertical-align:middle;}
+.agg-table td.zero{color:#ddd;}
+.agg-table td.has-names{background:var(--olive-pale);}
+.agg-table td.has-names .name-list{display:flex;flex-direction:column;gap:2px;align-items:center;}
+.agg-table td.has-names .name-item{font-size:10px;font-weight:600;color:var(--olive);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 1px;}
 
 /* 빈 상태 */
 .empty-state{text-align:center;padding:44px 20px;color:var(--muted);}
 .empty-state .empty-icon{font-size:36px;margin-bottom:10px;}
 .empty-state p{font-size:13px;line-height:1.8;}
+
+/* 집계표 셀 클릭 팝업 */
+.cell-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  z-index:400;align-items:flex-end;justify-content:center;}
+.cell-modal-overlay.show{display:flex;}
+.cell-modal{background:white;border-radius:16px 16px 0 0;padding:20px 18px 28px;
+  width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.15);}
+.cell-modal-title{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;
+  color:var(--ink);margin-bottom:4px;}
+.cell-modal-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.cell-modal-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;
+  margin-bottom:14px;}
+.cell-check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;
+  background:white;transition:background 0.1s;-webkit-user-select:none;user-select:none;}
+.cell-check-item.checked{background:var(--olive-pale);border-color:var(--olive);}
+.cell-check-item.checked .cell-check-name{color:var(--olive);font-weight:600;}
+.cell-check-box{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;
+  background:white;transition:all 0.1s;}
+.cell-check-item.checked .cell-check-box{background:var(--olive);border-color:var(--olive);color:white;}
+.cell-check-name{font-size:13px;color:var(--ink);flex:1;}
+.cell-check-class{font-size:11px;color:var(--muted);}
+.cell-modal-btns{display:flex;gap:8px;}
+.cell-modal-btns .btn{flex:1;min-height:46px;font-size:14px;}
+/* 집계표 셀 커서 */
+.agg-table td.zero,.agg-table td.has-names{cursor:pointer;}
+.agg-table td.zero:hover{background:#f5f5f5;}
+.agg-table td.has-names:hover{background:#daedb8;}
 
 /* 필터결과 카운트 */
 .filter-result{font-size:12px;color:var(--muted);margin-bottom:10px;padding-left:2px;}
@@ -271,7 +310,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 <!-- 탭바 -->
 <div class="tab-bar">
   <button class="tab-btn active" id="tabApply" onclick="switchTab('apply')">📝 신청하기</button>
-  <button class="tab-btn"        id="tabView"  onclick="switchTab('view')">📋 조회하기</button>
+  <button class="tab-btn"        id="tabView"  onclick="switchTab('view')">📋 조회 및 수정하기</button>
 </div>
 
 <!-- ══ 신청 탭 ══ -->
@@ -343,31 +382,25 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 
   <!-- 필터바 -->
   <div class="filter-bar">
-    <div class="filter-row">
-      <span class="filter-label">반별</span>
-      <div class="filter-chips" id="filterClass">
-        <button class="chip active" data-val="">전체</button>
-        <button class="chip" data-val="수주반">수주반</button>
-        <button class="chip" data-val="분주반">분주반</button>
-        <button class="chip" data-val="화요반">화요반</button>
-        <button class="chip" data-val="교역자">교역자</button>
-        <button class="chip" data-val="기도후원자(OB)">기도후원자</button>
-      </div>
+    <div class="filter-select-wrap">
+      <select class="filter-select" id="filterClass" onchange="onFilterClass()">
+        <option value="">전체 반</option>
+        <option value="수주반">수주반</option>
+        <option value="분주반">분주반</option>
+        <option value="화요반">화요반</option>
+        <option value="교역자">교역자</option>
+        <option value="기도후원자(OB)">기도후원자(OB)</option>
+      </select>
     </div>
-    <div class="filter-row">
-      <span class="filter-label">이름</span>
-      <input class="search-input" id="filterName" placeholder="이름 검색..." maxlength="20"
-        oninput="applyFilters()"/>
+    <div class="filter-select-wrap">
+      <select class="filter-select" id="filterWeek" onchange="onFilterWeek()">
+        <option value="">전체 주차</option>
+        <option value="0">1주차</option>
+        <option value="1">2주차</option>
+        <option value="2">3주차</option>
+      </select>
     </div>
-    <div class="filter-row">
-      <span class="filter-label">주차</span>
-      <div class="filter-chips" id="filterWeek">
-        <button class="chip active" data-val="">전체</button>
-        <button class="chip" data-val="0">1주차</button>
-        <button class="chip" data-val="1">2주차</button>
-        <button class="chip" data-val="2">3주차</button>
-      </div>
-    </div>
+    <input class="search-input" id="filterName" placeholder="홍길동" maxlength="20"/>
   </div>
 
   <!-- 새로고침 -->
@@ -387,6 +420,19 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 </div>
 
 <!-- ══ 인증 모달 ══ -->
+<!-- 집계표 셀 클릭 팝업 -->
+<div class="cell-modal-overlay" id="cellModal" onclick="onCellModalBg(event)">
+  <div class="cell-modal">
+    <div class="cell-modal-title" id="cellModalTitle">5/20 점심 기도</div>
+    <div class="cell-modal-sub" id="cellModalSub">신청자를 체크/해제하여 수정하세요</div>
+    <div class="cell-modal-list" id="cellModalList"></div>
+    <div class="cell-modal-btns">
+      <button class="btn" onclick="closeCellModal()">취소</button>
+      <button class="btn btn-primary" id="cellModalSaveBtn" onclick="saveCellModal()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="authModal">
   <div class="modal">
     <h3 id="modalTitle">본인 확인</h3>
@@ -420,7 +466,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 // ============================================================
 // ★ Apps Script 배포 URL
 // ============================================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyuM7SUXIB0bVEj6I035eR1kLM5AWDdBXvv-AJdmdMpmoZCSNiizMKawwmy1GoVOdw1Yw/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbWgrArwycqzdex1dIwwDwnNuh1AD8kCeSeoeVKb01wM4HLzyJxm6FZR5onzYECQ2KXg/exec";
 // ============================================================
 
 const WEEKS = [
@@ -636,20 +682,18 @@ function adminLogout(){
    필터
 ════════════════ */
 // 칩 클릭
-document.getElementById("filterClass").addEventListener("click",e=>{
-  const chip=e.target.closest(".chip"); if(!chip) return;
-  document.querySelectorAll("#filterClass .chip").forEach(c=>c.classList.remove("active"));
-  chip.classList.add("active");
-  filterClassVal=chip.dataset.val;
+// 필터 이벤트
+document.getElementById("filterName").addEventListener("input", ()=>applyFilters());
+document.getElementById("filterName").addEventListener("change", ()=>applyFilters());
+
+function onFilterClass(){
+  filterClassVal = document.getElementById("filterClass").value;
   applyFilters();
-});
-document.getElementById("filterWeek").addEventListener("click",e=>{
-  const chip=e.target.closest(".chip"); if(!chip) return;
-  document.querySelectorAll("#filterWeek .chip").forEach(c=>c.classList.remove("active"));
-  chip.classList.add("active");
-  filterWeekVal=chip.dataset.val;
+}
+function onFilterWeek(){
+  filterWeekVal = document.getElementById("filterWeek").value;
   applyFilters();
-});
+}
 
 function getFilteredRows(){
   if(!cachedRows||cachedRows.length===0) return [];
@@ -657,8 +701,12 @@ function getFilteredRows(){
   return cachedRows.filter(row=>{
     // 반별 필터
     if(filterClassVal && !row.name.includes(filterClassVal)) return false;
-    // 이름 검색
-    if(nameQ && !row.name.toLowerCase().includes(nameQ)) return false;
+    // 이름 검색 (반명 제외한 순수 이름으로도 검색)
+    if(nameQ){
+      const fullName = row.name.toLowerCase();
+      const shortName = row.name.replace(/\s*\(.*?\)\s*$/, "").trim().toLowerCase();
+      if(!fullName.includes(nameQ) && !shortName.includes(nameQ)) return false;
+    }
     // 주차별 필터 - 해당 주차에 O가 하나라도 있어야 표시
     if(filterWeekVal!==""){
       const weekIdx=parseInt(filterWeekVal);
@@ -793,54 +841,51 @@ function onEditClick(row, card, editBtn){
     return;
   }
 
-  // 관리자면 바로 열기, 아니면 인증 모달
+  // 관리자면 바로 열기, 아니면 카드 아래 안내 메시지 표시
   if(isAdmin){
     openEditPanel(row, card, editBtn);
   } else {
-    pendingEditName=row.name;
-    pendingAction="edit";
-    pendingCard=card;
-    pendingEditBtn=editBtn;
-    pendingRow=row;
-    openModal("본인 확인", "수정하려면 이름과 반명을 입력해 주세요.");
+    showEditGuide(row, card, editBtn);
   }
 }
 
 let pendingCard=null, pendingEditBtn=null, pendingRow=null;
 
 /* ════════════════
-   인증 모달
+   수정 안내 메시지 (비관리자)
 ════════════════ */
-function openModal(title, desc){
-  document.getElementById("modalTitle").textContent=title;
-  document.getElementById("modalDesc").textContent=desc;
-  document.getElementById("modalName").value="";
-  document.getElementById("modalClass").value="";
-  document.getElementById("modalName").classList.remove("error");
-  document.getElementById("authModal").classList.add("show");
-  setTimeout(()=>document.getElementById("modalName").focus(),100);
+function showEditGuide(row, card, editBtn){
+  // 기존 안내 메시지 모두 제거
+  document.querySelectorAll(".edit-guide").forEach(g=>g.remove());
+
+  // 예시: 이름에서 반명 추출
+  const shortName = row.name.replace(/\s*\(.*?\)\s*$/, "").trim();
+  const className = (row.name.match(/\(([^)]+)\)/) || [])[1] || "";
+  const example   = shortName + "-" + className;
+
+  const guide = document.createElement("div");
+  guide.className = "edit-guide";
+  guide.innerHTML =
+    '<div class="edit-guide-title">✏️ 본인 확인 후 수정하세요</div>' +
+    '<div class="edit-guide-desc">상단 검색창에 본인의 이름을 입력하면<br>해당 카드에서 바로 수정하실 수 있습니다.</div>' +
+    '<div class="edit-guide-example">예) ' + esc(example) + '</div>' +
+    '<button class="edit-guide-close" onclick="this.closest('.edit-guide').remove()">닫기 ✕</button>';
+
+  // 카드 아래에 안내 삽입
+  card.appendChild(guide);
+
+  // 검색창으로 포커스 이동
+  const searchInput = document.getElementById("filterName");
+  if(searchInput){
+    searchInput.focus();
+    searchInput.scrollIntoView({behavior:"smooth", block:"center"});
+  }
 }
+
 function closeModal(){
   document.getElementById("authModal").classList.remove("show");
   pendingEditName=null; pendingAction=null;
   pendingCard=null; pendingEditBtn=null; pendingRow=null;
-}
-function confirmAuth(){
-  const inputName=document.getElementById("modalName").value.trim();
-  const inputClass=document.getElementById("modalClass").value;
-  if(!inputName||!inputClass){
-    document.getElementById("modalName").classList.add("error");
-    showToast("이름과 반명을 모두 입력해 주세요","error"); return;
-  }
-  const fullInput=inputName+" ("+inputClass+")";
-  if(fullInput!==pendingEditName){
-    document.getElementById("modalName").classList.add("error");
-    showToast("이름 또는 반명이 일치하지 않습니다","error"); return;
-  }
-  closeModal();
-  if(pendingAction==="edit"){
-    openEditPanel(pendingRow, pendingCard, pendingEditBtn);
-  }
 }
 
 /* ════════════════
@@ -994,21 +1039,21 @@ function renderAgg(rows){
   const weekIdx = filterWeekVal!=="" ? parseInt(filterWeekVal) : null;
   const targetWeeks = weekIdx!==null ? [WEEKS[weekIdx]] : WEEKS;
 
-  const counts={};
-  ALL_DATES.forEach(d=>MEALS.forEach(m=>{counts[d.key+"_"+m.key]=0;}));
+  // 슬롯별 이름 목록 수집
+  const nameMap={};
+  ALL_DATES.forEach(d=>MEALS.forEach(m=>{ nameMap[d.key+"_"+m.key]=[]; }));
   rows.forEach(row=>{
     if(!row.selections) return;
+    // 이름에서 반명 제거: "홍길동 (수주반)" → "홍길동"
+    const shortName = row.name ? row.name.replace(/\s*\(.*?\)\s*$/,"").trim() : "";
     Object.keys(row.selections).forEach(k=>{
-      if(row.selections[k]==="O"&&counts[k]!==undefined) counts[k]++;
+      if(row.selections[k]==="O" && nameMap[k]!==undefined){
+        nameMap[k].push(shortName);
+      }
     });
   });
 
-  function cntClass(n){
-    if(n===0) return "zero"; if(n===1) return "cnt1";
-    if(n===2) return "cnt2"; if(n===3) return "cnt3"; return "cnt4plus";
-  }
-
-  let html='<p style="font-size:12px;color:var(--muted);margin-bottom:10px;">총 <b>'+rows.length+'명</b> 신청 · 숫자는 기도 참여 인원수</p>';
+  let html='<p style="font-size:12px;color:var(--muted);margin-bottom:10px;">총 <b>'+rows.length+'명</b> 신청</p>';
   targetWeeks.forEach(week=>{
     html+='<div class="agg-section"><div class="agg-section-title">'+week.label+'</div>'+
       '<table class="agg-table"><thead><tr><th style="width:34px"></th>'+
@@ -1017,14 +1062,157 @@ function renderAgg(rows){
     MEALS.forEach(meal=>{
       html+='<tr><td class="meal-lbl" style="white-space:pre-line">'+meal.label+'</td>';
       week.dates.forEach(d=>{
-        const k=d.key+"_"+meal.key; const n=counts[k]||0;
-        html+='<td class="'+cntClass(n)+'">'+(n>0?n:"·")+'</td>';
+        const k=d.key+"_"+meal.key;
+        const names=nameMap[k]||[];
+        if(names.length===0){
+          html+='<td class="zero" onclick="openCellModal(''+k+'')">·</td>';
+        } else {
+          const nameItems=names.map(n=>'<span class="name-item">'+esc(n)+'</span>').join('');
+          html+='<td class="has-names" onclick="openCellModal(''+k+'')"><div class="name-list">'+nameItems+'</div></td>';
+        }
       });
       html+='</tr>';
     });
     html+='</tbody></table></div>';
   });
   el.innerHTML=html;
+}
+
+/* ════════════════
+   집계표 셀 팝업
+════════════════ */
+let cellModalKey = null;   // 현재 팝업 열린 슬롯 키 (예: "0520_lunch")
+let cellModalSel = {};     // 팝업 내 체크 상태 {fullName: true/false}
+
+function openCellModal(slotKey){
+  if(!cachedRows||cachedRows.length===0){
+    showToast("먼저 데이터를 불러와 주세요","error"); return;
+  }
+  cellModalKey = slotKey;
+  cellModalSel = {};
+
+  // 키 파싱: "0520_lunch" → 날짜 라벨 + 끼니 라벨
+  const parts = slotKey.split("_");
+  const dateKey = parts[0];
+  const mealKey = parts[1];
+  const dateObj = ALL_DATES.find(d=>d.key===dateKey);
+  const mealObj = MEALS.find(m=>m.key===mealKey);
+  const dateLabel = dateObj ? dateObj.label.replace("\n"," ") : dateKey;
+  const mealLabel = mealObj ? mealObj.short : mealKey;
+
+  document.getElementById("cellModalTitle").textContent = dateLabel+" "+mealLabel+" 기도";
+  document.getElementById("cellModalSub").textContent =
+    "체크하면 신청 추가, 해제하면 신청 제거됩니다.";
+
+  // 전체 신청자 목록 + 현재 슬롯 체크 여부
+  const list = document.getElementById("cellModalList");
+  list.innerHTML="";
+
+  // 관리자가 아니면 저장 버튼 비활성
+  const saveBtn = document.getElementById("cellModalSaveBtn");
+  if(!isAdmin){
+    saveBtn.disabled=true;
+    saveBtn.title="관리자만 저장 가능합니다";
+    document.getElementById("cellModalSub").textContent =
+      "조회 전용 (수정은 관리자만 가능합니다)";
+  } else {
+    saveBtn.disabled=false;
+    saveBtn.title="";
+  }
+
+  cachedRows.forEach(row=>{
+    const isChecked = row.selections && row.selections[slotKey]==="O";
+    cellModalSel[row.name] = isChecked;
+
+    const item = document.createElement("div");
+    item.className = "cell-check-item" + (isChecked?" checked":"");
+    item.dataset.name = row.name;
+
+    const box = document.createElement("div");
+    box.className="cell-check-box";
+    box.textContent = isChecked?"✓":"";
+
+    const shortName = row.name.replace(/\s*\(.*?\)\s*$/,"").trim();
+    const className = row.name.match(/\(([^)]+)\)/)?.[1]||"";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className="cell-check-name"; nameSpan.textContent=shortName;
+    const classSpan = document.createElement("span");
+    classSpan.className="cell-check-class"; classSpan.textContent=className;
+
+    item.appendChild(box);
+    item.appendChild(nameSpan);
+    item.appendChild(classSpan);
+
+    if(isAdmin){
+      item.onclick=()=>toggleCellItem(item, row.name);
+    }
+    list.appendChild(item);
+  });
+
+  document.getElementById("cellModal").classList.add("show");
+}
+
+function toggleCellItem(item, name){
+  const checked = !cellModalSel[name];
+  cellModalSel[name] = checked;
+  item.classList.toggle("checked", checked);
+  item.querySelector(".cell-check-box").textContent = checked?"✓":"";
+}
+
+function closeCellModal(){
+  document.getElementById("cellModal").classList.remove("show");
+  cellModalKey=null; cellModalSel={};
+}
+
+function onCellModalBg(e){
+  if(e.target===document.getElementById("cellModal")) closeCellModal();
+}
+
+async function saveCellModal(){
+  if(!cellModalKey) return;
+  if(!isAdmin){ showToast("관리자만 저장할 수 있습니다","error"); return; }
+
+  // 변경된 사람만 추출
+  const changed=[];
+  cachedRows.forEach(row=>{
+    const wasChecked = row.selections && row.selections[cellModalKey]==="O";
+    const isChecked  = !!cellModalSel[row.name];
+    if(wasChecked !== isChecked) changed.push({row, isChecked});
+  });
+
+  if(changed.length===0){
+    showToast("변경된 내용이 없습니다","error"); return;
+  }
+
+  showLoading("저장 중...");
+  document.getElementById("cellModalSaveBtn").disabled=true;
+  try{
+    const adminPw = sessionStorage.getItem("adminPw")||"";
+    // 변경된 사람 각각 selections 업데이트 후 저장
+    for(const {row, isChecked} of changed){
+      const selections = Object.assign({}, row.selections||{});
+      selections[cellModalKey] = isChecked ? "O" : "";
+      const res = await fetch(SCRIPT_URL,{
+        method:"POST",
+        body:JSON.stringify({
+          action:"save", name:row.name,
+          timestamp:new Date().toLocaleString("ko-KR"),
+          selections, adminPw
+        })
+      });
+      const result = await res.json();
+      if(result.status!=="ok") throw new Error(result.message||"오류");
+    }
+    showToast("✓ "+changed.length+"명 수정 완료!","success");
+    closeCellModal();
+    await loadViewData();
+  } catch(e){
+    showToast("오류: "+e.message,"error");
+  } finally{
+    hideLoading();
+    document.getElementById("cellModalSaveBtn").disabled=false;
+  }
 }
 
 function renderEmpty(id,msg){
