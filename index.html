@@ -682,9 +682,14 @@ function adminLogout(){
    필터
 ════════════════ */
 // 칩 클릭
-// 필터 이벤트
-document.getElementById("filterName").addEventListener("input", ()=>applyFilters());
-document.getElementById("filterName").addEventListener("change", ()=>applyFilters());
+// 필터 이벤트 (DOMContentLoaded 이후 등록)
+function initFilterEvents(){
+  const el = document.getElementById("filterName");
+  if(el){
+    el.addEventListener("input", ()=>applyFilters());
+    el.addEventListener("change", ()=>applyFilters());
+  }
+}
 
 function onFilterClass(){
   filterClassVal = document.getElementById("filterClass").value;
@@ -1239,7 +1244,10 @@ function esc(str){
 }
 
 // 초기 실행
-buildSchedule();
+document.addEventListener("DOMContentLoaded", function(){
+  initFilterEvents();
+  buildSchedule();
+});
 </script>
 </body>
 </html>
