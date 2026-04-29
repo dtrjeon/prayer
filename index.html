@@ -874,7 +874,7 @@ function showEditGuide(row, card, editBtn){
     '<div class="edit-guide-title">✏️ 본인 확인 후 수정하세요</div>' +
     '<div class="edit-guide-desc">상단 검색창에 본인의 이름을 입력하면<br>해당 카드에서 바로 수정하실 수 있습니다.</div>' +
     '<div class="edit-guide-example">예) ' + esc(example) + '</div>' +
-    '<button class="edit-guide-close" onclick="this.closest('.edit-guide').remove()">닫기 ✕</button>';
+    '<button class="edit-guide-close" onclick="this.closest(\'.edit-guide\').remove()">닫기 ✕</button>';
 
   // 카드 아래에 안내 삽입
   card.appendChild(guide);
@@ -1070,10 +1070,10 @@ function renderAgg(rows){
         const k=d.key+"_"+meal.key;
         const names=nameMap[k]||[];
         if(names.length===0){
-          html+='<td class="zero" onclick="openCellModal(''+k+'')">·</td>';
+          html+='<td class="zero" onclick="openCellModal(\''+k+'\')">·</td>';
         } else {
           const nameItems=names.map(n=>'<span class="name-item">'+esc(n)+'</span>').join('');
-          html+='<td class="has-names" onclick="openCellModal(''+k+'')"><div class="name-list">'+nameItems+'</div></td>';
+          html+='<td class="has-names" onclick="openCellModal(\''+k+'\')"><div class="name-list">'+nameItems+'</div></td>';
         }
       });
       html+='</tr>';
