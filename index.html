@@ -131,7 +131,6 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 .agg-table td.cell.has-names:hover{background:#d2e8b0;}
 .agg-table td.cell.zero:hover{background:#f5f5f5;}
 .agg-table td.cell.filtered-out{opacity:0.25;pointer-events:none;}
-.agg-table td.cell.highlighted{}
 .cell-dot{color:#ccc;font-size:14px;line-height:42px;}
 .cell-names{display:flex;flex-direction:column;gap:1px;padding:2px 1px;}
 .name-chip{font-size:9px;font-weight:600;color:var(--olive);
@@ -236,7 +235,6 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
   box-shadow:0 1px 3px rgba(0,0,0,0.2);}
 .toggle-track.on .toggle-thumb{left:20px;}
 
-/* 빈 셀 숨김 모드 — JS로 처리 */
 .empty-state{text-align:center;padding:44px 20px;color:var(--muted);}
 .empty-state .empty-icon{font-size:36px;margin-bottom:10px;}
 .empty-state p{font-size:13px;line-height:1.8;}
@@ -370,10 +368,16 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 
 <script>
 // ============================================================
-// ★ Apps Script 배포 URL — 실제 URL을 아래에 입력하세요
+// ★ Apps Script 배포 URL
 // ============================================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWWr157IwDTOIvPaQnTkqIQ0IfbizIiMFnDK5LqLAnTGtXBMYPFqwMRvGo6gde-ZQR2Q/exec"; // TODO: Apps Script 배포 URL 입력
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWWr157IwDTOIvPaQnTkqIQ0IfbizIiMFnDK5LqLAnTGtXBMYPFqwMRvGo6gde-ZQR2Q/exec";
 // ============================================================
+
+// ============================================================
+// ★ 시트 이름 목록 (구글시트 탭 순서와 일치하게 설정)
+//    순서: 수주반, 분주반, 화요반, 교역자, 기도후원자(OB), LOGFILE
+// ============================================================
+const SHEET_NAMES = ["수주반", "분주반", "화요반", "교역자", "기도후원자(OB)", "LOGFILE"];
 
 const WEEKS = [
   { label:"1주차 (5/17 ~ 5/23)", dates:[
@@ -402,123 +406,6 @@ const MEALS = [
 ];
 const ALL_DATES = WEEKS.flatMap(w=>w.dates);
 
-let cachedRows = [
-  { name:"김철수 (수주반)", timestamp:"2026-05-01 09:00", selections:{
-    "0517_morning":"O","0517_lunch":"","0517_evening":"O",
-    "0518_morning":"O","0518_lunch":"O","0518_evening":"",
-    "0519_morning":"","0519_lunch":"O","0519_evening":"",
-    "0520_morning":"O","0520_lunch":"","0520_evening":"O",
-    "0521_morning":"","0521_lunch":"","0521_evening":"",
-    "0522_morning":"O","0522_lunch":"O","0522_evening":"",
-    "0523_morning":"","0523_lunch":"","0523_evening":"O",
-    "0524_morning":"O","0524_lunch":"","0524_evening":"",
-    "0525_morning":"","0525_lunch":"O","0525_evening":"O",
-    "0526_morning":"O","0526_lunch":"","0526_evening":"",
-    "0527_morning":"","0527_lunch":"O","0527_evening":"",
-    "0528_morning":"O","0528_lunch":"O","0528_evening":"O",
-    "0529_morning":"","0529_lunch":"","0529_evening":"",
-    "0530_morning":"O","0530_lunch":"","0530_evening":"",
-    "0531_morning":"O","0531_lunch":"O","0531_evening":"",
-    "0601_morning":"","0601_lunch":"","0601_evening":"O",
-    "0602_morning":"O","0602_lunch":"","0602_evening":"",
-    "0603_morning":"","0603_lunch":"O","0603_evening":"O",
-    "0604_morning":"O","0604_lunch":"","0604_evening":"",
-    "0605_morning":"","0605_lunch":"O","0605_evening":"",
-    "0606_morning":"O","0606_lunch":"O","0606_evening":"O",
-  }},
-  { name:"이영희 (분주반)", timestamp:"2026-05-02 10:30", selections:{
-    "0517_morning":"","0517_lunch":"O","0517_evening":"",
-    "0518_morning":"O","0518_lunch":"","0518_evening":"O",
-    "0519_morning":"O","0519_lunch":"O","0519_evening":"",
-    "0520_morning":"","0520_lunch":"O","0520_evening":"O",
-    "0521_morning":"O","0521_lunch":"","0521_evening":"",
-    "0522_morning":"","0522_lunch":"O","0522_evening":"",
-    "0523_morning":"O","0523_lunch":"","0523_evening":"O",
-    "0524_morning":"","0524_lunch":"O","0524_evening":"",
-    "0525_morning":"O","0525_lunch":"","0525_evening":"O",
-    "0526_morning":"","0526_lunch":"O","0526_evening":"",
-    "0527_morning":"O","0527_lunch":"O","0527_evening":"",
-    "0528_morning":"","0528_lunch":"","0528_evening":"O",
-    "0529_morning":"O","0529_lunch":"","0529_evening":"",
-    "0530_morning":"","0530_lunch":"O","0530_evening":"O",
-    "0531_morning":"O","0531_lunch":"","0531_evening":"",
-    "0601_morning":"O","0601_lunch":"O","0601_evening":"",
-    "0602_morning":"","0602_lunch":"","0602_evening":"O",
-    "0603_morning":"O","0603_lunch":"","0603_evening":"",
-    "0604_morning":"","0604_lunch":"O","0604_evening":"O",
-    "0605_morning":"O","0605_lunch":"","0605_evening":"",
-    "0606_morning":"","0606_lunch":"O","0606_evening":"",
-  }},
-  { name:"박민준 (화요반)", timestamp:"2026-05-03 14:00", selections:{
-    "0517_morning":"O","0517_lunch":"O","0517_evening":"",
-    "0518_morning":"","0518_lunch":"","0518_evening":"O",
-    "0519_morning":"O","0519_lunch":"","0519_evening":"O",
-    "0520_morning":"","0520_lunch":"O","0520_evening":"",
-    "0521_morning":"O","0521_lunch":"O","0521_evening":"O",
-    "0522_morning":"","0522_lunch":"","0522_evening":"O",
-    "0523_morning":"O","0523_lunch":"","0523_evening":"",
-    "0524_morning":"O","0524_lunch":"O","0524_evening":"",
-    "0525_morning":"","0525_lunch":"O","0525_evening":"",
-    "0526_morning":"O","0526_lunch":"","0526_evening":"O",
-    "0527_morning":"","0527_lunch":"O","0527_evening":"",
-    "0528_morning":"O","0528_lunch":"","0528_evening":"",
-    "0529_morning":"","0529_lunch":"O","0529_evening":"O",
-    "0530_morning":"O","0530_lunch":"","0530_evening":"",
-    "0531_morning":"","0531_lunch":"O","0531_evening":"O",
-    "0601_morning":"O","0601_lunch":"","0601_evening":"",
-    "0602_morning":"O","0602_lunch":"O","0602_evening":"",
-    "0603_morning":"","0603_lunch":"","0603_evening":"O",
-    "0604_morning":"O","0604_lunch":"O","0604_evening":"",
-    "0605_morning":"","0605_lunch":"O","0605_evening":"O",
-    "0606_morning":"O","0606_lunch":"","0606_evening":"",
-  }},
-  { name:"최지은 (교역자)", timestamp:"2026-05-04 08:00", selections:{
-    "0517_morning":"O","0517_lunch":"","0517_evening":"O",
-    "0518_morning":"","0518_lunch":"O","0518_evening":"",
-    "0519_morning":"O","0519_lunch":"O","0519_evening":"O",
-    "0520_morning":"","0520_lunch":"","0520_evening":"O",
-    "0521_morning":"O","0521_lunch":"","0521_evening":"",
-    "0522_morning":"O","0522_lunch":"O","0522_evening":"",
-    "0523_morning":"","0523_lunch":"O","0523_evening":"O",
-    "0524_morning":"O","0524_lunch":"","0524_evening":"",
-    "0525_morning":"","0525_lunch":"O","0525_evening":"O",
-    "0526_morning":"O","0526_lunch":"O","0526_evening":"",
-    "0527_morning":"","0527_lunch":"","0527_evening":"O",
-    "0528_morning":"O","0528_lunch":"","0528_evening":"",
-    "0529_morning":"O","0529_lunch":"O","0529_evening":"",
-    "0530_morning":"","0530_lunch":"O","0530_evening":"O",
-    "0531_morning":"O","0531_lunch":"","0531_evening":"",
-    "0601_morning":"","0601_lunch":"O","0601_evening":"O",
-    "0602_morning":"O","0602_lunch":"","0602_evening":"",
-    "0603_morning":"O","0603_lunch":"O","0603_evening":"",
-    "0604_morning":"","0604_lunch":"","0604_evening":"O",
-    "0605_morning":"O","0605_lunch":"O","0605_evening":"",
-    "0606_morning":"","0606_lunch":"O","0606_evening":"O",
-  }},
-  { name:"정하늘 (기도후원자(OB))", timestamp:"2026-05-05 11:00", selections:{
-    "0517_morning":"","0517_lunch":"O","0517_evening":"O",
-    "0518_morning":"O","0518_lunch":"","0518_evening":"",
-    "0519_morning":"","0519_lunch":"O","0519_evening":"",
-    "0520_morning":"O","0520_lunch":"O","0520_evening":"",
-    "0521_morning":"","0521_lunch":"","0521_evening":"O",
-    "0522_morning":"O","0522_lunch":"","0522_evening":"O",
-    "0523_morning":"","0523_lunch":"O","0523_evening":"",
-    "0524_morning":"O","0524_lunch":"","0524_evening":"O",
-    "0525_morning":"O","0525_lunch":"O","0525_evening":"",
-    "0526_morning":"","0526_lunch":"","0526_evening":"O",
-    "0527_morning":"O","0527_lunch":"","0527_evening":"",
-    "0528_morning":"","0528_lunch":"O","0528_evening":"O",
-    "0529_morning":"O","0529_lunch":"O","0529_evening":"",
-    "0530_morning":"","0530_lunch":"","0530_evening":"O",
-    "0531_morning":"O","0531_lunch":"O","0531_evening":"",
-    "0601_morning":"","0601_lunch":"O","0601_evening":"",
-    "0602_morning":"O","0602_lunch":"","0602_evening":"O",
-    "0603_morning":"","0603_lunch":"O","0603_evening":"",
-    "0604_morning":"O","0604_lunch":"","0604_evening":"O",
-    "0605_morning":"","0605_lunch":"O","0605_evening":"O",
-    "0606_morning":"O","0606_lunch":"","0606_evening":"",
-  }},
-];
 // 전체 수정/삭제/추가 권한자 목록
 const ADMIN_LIST = new Set([
   "유연희 (화요반)",
@@ -526,31 +413,55 @@ const ADMIN_LIST = new Set([
   "이지혜 (수주반)",
   "최정희 (화요반)",
   "조호점 (분주반)",
-  "김찬영 (교역자)",  
-  // 나머지 2명은 추후 추가
+  "김찬영 (교역자)",
 ]);
 
-function getMyFullName(){
-  const name = document.getElementById("myName").value.trim();
-  const cls  = document.getElementById("myClass").value;
-  if(!name || !cls) return null;
-  return name+" ("+cls+")";
+// ============================================================
+// ★ index_old.html 저장 양식에 맞는 데이터 변환 함수
+//
+//   구글시트 저장 형식 (index_old 기준):
+//   열 순서 → [이름(반명포함), 타임스탬프, 0517_morning, 0517_lunch, ... 0606_evening]
+//   값: "O" 또는 "" (빈문자열)
+//   시트: 반별로 분리 저장 (수주반, 분주반, 화요반, 교역자, 기도후원자(OB))
+//         + LOGFILE 시트에 전체 이력 기록
+// ============================================================
+
+/** 전송 payload 생성 — index_old 양식과 동일 */
+function buildPayload(row) {
+  // row.name 예: "홍길동 (수주반)"
+  const selections = {};
+  ALL_DATES.forEach(d => MEALS.forEach(m => {
+    const k = d.key + "_" + m.key;
+    selections[k] = (row.selections && row.selections[k] === "O") ? "O" : "";
+  }));
+
+  return {
+    name:      row.name,                        // "홍길동 (수주반)"
+    timestamp: row.timestamp || getTimestamp(), // 타임스탬프
+    selections                                  // { 0517_morning:"O", ... }
+  };
 }
 
-function isAdmin(){
-  const my = getMyFullName();
-  return my && ADMIN_LIST.has(my);
+/** row.name 에서 반명 추출 */
+function getClassName(fullName) {
+  const m = fullName.match(/\(([^)]+)\)/);
+  return m ? m[1] : "";
 }
+
+// 데이터 캐시
+let cachedRows = [];
+let originalRows = {}; // fullName → 원본 selections 스냅샷 (JSON string)
+let dirtyRows = new Set();
 
 let hideEmpty = false;
 let classColor = false;
 
 /* 반별 색상 */
 const CLASS_COLOR_MAP = {
-  "수주반":   "cls-수주반",
-  "분주반":   "cls-분주반",
-  "화요반":   "cls-화요반",
-  "교역자":   "cls-교역자",
+  "수주반":         "cls-수주반",
+  "분주반":         "cls-분주반",
+  "화요반":         "cls-화요반",
+  "교역자":         "cls-교역자",
   "기도후원자(OB)": "cls-기도후원자",
 };
 function getClassColorCls(fullName){
@@ -565,10 +476,18 @@ function toggleClassColor(){
 }
 
 /* ════════════════
-   내 정보 등록
+   내 정보
 ════════════════ */
-let originalRows = {}; // fullName → 원본 selections 스냅샷
-let dirtyRows = new Set(); // 변경된 fullName 목록
+function getMyFullName(){
+  const name = document.getElementById("myName").value.trim();
+  const cls  = document.getElementById("myClass").value;
+  if(!name || !cls) return null;
+  return name+" ("+cls+")";
+}
+function isAdmin(){
+  const my = getMyFullName();
+  return my && ADMIN_LIST.has(my);
+}
 
 function markDirty(fullName){
   dirtyRows.add(fullName);
@@ -580,21 +499,20 @@ function clearDirty(){
 }
 
 function onMyInfoChange(){
-  const name = document.getElementById("myName").value.trim();
-  const cls  = document.getElementById("myClass").value;
+  const name  = document.getElementById("myName").value.trim();
+  const cls   = document.getElementById("myClass").value;
   const badge = document.getElementById("myBadge");
   const guide = document.getElementById("userGuide");
 
   if(name && cls){
     const fullName = name+" ("+cls+")";
-    const admin = ADMIN_LIST.has(fullName);
+    const admin    = ADMIN_LIST.has(fullName);
     badge.textContent = (admin ? "🔑 " : "👤 ")+fullName;
     badge.style.background  = admin ? "#fdf3d8" : "";
     badge.style.borderColor = admin ? "var(--gold-border)" : "";
     badge.style.color       = admin ? "var(--gold)" : "";
     badge.style.display = "";
     guide.classList.add("hidden");
-    // 서버에서 데이터 로드
     loadDataForUser();
   } else {
     badge.style.display = "none";
@@ -606,18 +524,17 @@ async function loadDataForUser(){
   if(!SCRIPT_URL){ renderGrid(); return; }
   showLoading("데이터 불러오는 중...");
   try{
-    const res = await fetch(SCRIPT_URL+"?action=read",{method:"GET"});
+    const res = await fetch(SCRIPT_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ action:"read" }),
+    });
     const data = await res.json();
     if(data.status==="ok"){
-      cachedRows = data.rows||[];
-      // 원본 스냅샷 저장
+      cachedRows = data.rows || [];
       originalRows = {};
-      cachedRows.forEach(r=>{
-        originalRows[r.name] = JSON.stringify(r.selections||{});
-      });
+      cachedRows.forEach(r=>{ originalRows[r.name] = JSON.stringify(r.selections||{}); });
       clearDirty();
-      document.getElementById("lastUpdated").textContent =
-        "업데이트: "+new Date().toLocaleTimeString("ko-KR");
     }
   } catch(e){
     showToast("데이터를 불러오지 못했습니다.","error");
@@ -629,6 +546,7 @@ async function loadDataForUser(){
 
 /* ════════════════
    구글시트로 보내기
+   — index_old 저장 양식과 동일하게 전송
 ════════════════ */
 async function sendToSheet(){
   if(dirtyRows.size===0){ showToast("변경된 내용이 없습니다","error"); return; }
@@ -641,18 +559,18 @@ async function sendToSheet(){
   document.getElementById("sendBtn").disabled = true;
   try{
     for(const row of toSend){
-      const res = await fetch(SCRIPT_URL,{
+      // ★ index_old 저장 양식과 동일한 payload 구성
+      const payload = buildPayload(row);
+      payload.action    = "save";        // Apps Script가 인식하는 액션
+      payload.timestamp = getTimestamp(); // 최신 타임스탬프로 갱신
+
+      const res = await fetch(SCRIPT_URL, {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          action:"save",
-          name:row.name,
-          timestamp:getTimestamp(),
-          selections:row.selections||{}
-        })
+        body:JSON.stringify(payload)
       });
       const result = await res.json();
-      if(result.status!=="ok") throw new Error(result.message||"오류");
+      if(result.status !== "ok") throw new Error(result.message || "오류");
     }
     showToast("✓ "+toSend.length+"명 구글시트 전송 완료!","success");
     clearDirty();
@@ -675,21 +593,23 @@ function toggleHideEmpty(){
    데이터 로드
 ════════════════ */
 async function loadData(clearFilters=false){
-  // 수동 새로고침 시에만 필터 초기화
   if(clearFilters){
     clearAllTags();
     document.getElementById("filterClass").value = "";
-    document.getElementById("filterWeek").value = "";
+    document.getElementById("filterWeek").value  = "";
   }
   if(!SCRIPT_URL){ renderGrid(); return; }
   showLoading("불러오는 중...");
   try{
-    const res = await fetch(SCRIPT_URL+"?action=read",{method:"GET"});
+    // ★ 전체 취합: 모든 시트(수주반,분주반,화요반,교역자,기도후원자(OB)) 데이터를 한번에 읽어옴
+    const res = await fetch(SCRIPT_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ action:"read" }),
+    });
     const data = await res.json();
-    if(data.status!=="ok") throw new Error(data.message||"오류");
-    cachedRows = data.rows||[];
-    document.getElementById("lastUpdated").textContent =
-      "업데이트: "+new Date().toLocaleTimeString("ko-KR");
+    if(data.status !== "ok") throw new Error(data.message || "오류");
+    cachedRows = data.rows || [];
   } catch(e){
     showToast("데이터를 불러오지 못했습니다.","error");
   } finally{
@@ -701,13 +621,11 @@ async function loadData(clearFilters=false){
 /* ════════════════
    태그 검색
 ════════════════ */
-let nameTags = []; // ["김철수", "이영희", ...]
+let nameTags = [];
 
 function initTagSearch(){
   const input = document.getElementById("filterName");
-  input.addEventListener("keyup", e=>{
-    if(e.key==="Enter") addTagFromInput();
-  });
+  input.addEventListener("keyup", e=>{ if(e.key==="Enter") addTagFromInput(); });
   input.addEventListener("input", ()=>applyFilter());
   document.getElementById("tagSearchWrap").addEventListener("click", e=>{
     if(e.target===document.getElementById("tagSearchWrap")||
@@ -718,38 +636,27 @@ function initTagSearch(){
 
 function addTagFromInput(){
   const input = document.getElementById("filterName");
-  const val = input.value.trim();
+  const val   = input.value.trim();
   if(!val) return;
   const norm = val.toLowerCase();
-  if(!nameTags.includes(norm)){
-    nameTags.push(norm);
-    renderTags();
-  }
+  if(!nameTags.includes(norm)){ nameTags.push(norm); renderTags(); }
   input.value = "";
   input.focus();
   applyFilter();
 }
-
-function removeTag(tag){
-  nameTags = nameTags.filter(t=>t!==tag);
-  renderTags();
-  applyFilter();
-}
-
+function removeTag(tag){ nameTags = nameTags.filter(t=>t!==tag); renderTags(); applyFilter(); }
 function clearAllTags(){
   nameTags=[];
   document.getElementById("filterName").value="";
-  renderTags();
-  applyFilter();
+  renderTags(); applyFilter();
 }
-
 function renderTags(){
-  const list = document.getElementById("tagList");
+  const list     = document.getElementById("tagList");
   const clearBtn = document.getElementById("tagClearBtn");
-  list.innerHTML="";
+  list.innerHTML = "";
   nameTags.forEach(tag=>{
     const item = document.createElement("div");
-    item.className="tag-item";
+    item.className = "tag-item";
     item.innerHTML = tag+'<button onclick="removeTag(\''+tag+'\')">✕</button>';
     list.appendChild(item);
   });
@@ -767,29 +674,25 @@ function getFilter(){
     week:  document.getElementById("filterWeek").value,
   };
 }
-
 function rowMatches(row, f){
   if(f.cls && !row.name.includes(f.cls)) return false;
   const short = row.name.replace(/\s*\(.*?\)\s*$/,"").trim().toLowerCase();
   const full  = row.name.toLowerCase();
-  // 태그가 있으면 태그 중 하나라도 매칭
   if(f.tags.length>0){
     const tagMatch = f.tags.some(t=>full.includes(t)||short.includes(t));
     if(!tagMatch) return false;
   }
-  // 입력 중인 텍스트 실시간 필터
   if(f.input && !full.includes(f.input) && !short.includes(f.input)) return false;
   return true;
 }
-
 function applyFilter(){ renderGrid(); }
 
 /* ════════════════
    그리드 렌더
 ════════════════ */
 function renderGrid(){
-  const f = getFilter();
-  const weekIdx = f.week !== "" ? parseInt(f.week) : null;
+  const f        = getFilter();
+  const weekIdx  = f.week !== "" ? parseInt(f.week) : null;
   const targetWeeks = weekIdx !== null ? [WEEKS[weekIdx]] : WEEKS;
 
   const matchedNames = new Set(
@@ -797,17 +700,14 @@ function renderGrid(){
   );
   const hasFilter = f.tags.length>0 || f.input || f.cls;
 
-  const total = cachedRows.length;
+  const total   = cachedRows.length;
   const matched = matchedNames.size;
   document.getElementById("statusCount").textContent =
-    hasFilter
-      ? "전체 "+total+"명 중 "+matched+"명 표시"
-      : "전체 "+total+"명 신청";
+    hasFilter ? "전체 "+total+"명 중 "+matched+"명 표시" : "전체 "+total+"명 신청";
 
   const section = document.getElementById("gridSection");
   section.innerHTML = "";
 
-  // 데이터 없어도 빈 그리드 골격은 항상 표시
   targetWeeks.forEach(week=>{
     const block = document.createElement("div");
     block.className = "week-block";
@@ -820,9 +720,8 @@ function renderGrid(){
     const table = document.createElement("table");
     table.className = "agg-table";
 
-    // 헤더
     const thead = document.createElement("thead");
-    const hrow = document.createElement("tr");
+    const hrow  = document.createElement("tr");
     const thLbl = document.createElement("th");
     thLbl.className = "lbl-col"; hrow.appendChild(thLbl);
     week.dates.forEach(d=>{
@@ -835,10 +734,9 @@ function renderGrid(){
     thead.appendChild(hrow);
     table.appendChild(thead);
 
-    // 바디
     const tbody = document.createElement("tbody");
     MEALS.forEach(meal=>{
-      const tr = document.createElement("tr");
+      const tr    = document.createElement("tr");
       const tdLbl = document.createElement("td");
       tdLbl.className = "meal-lbl";
       tdLbl.style.whiteSpace = "pre-line";
@@ -846,16 +744,16 @@ function renderGrid(){
       tr.appendChild(tdLbl);
 
       week.dates.forEach(d=>{
-        const slotKey = d.key+"_"+meal.key;
+        const slotKey  = d.key+"_"+meal.key;
         const allNames = cachedRows
           .filter(r=>r.selections&&r.selections[slotKey]==="O")
           .map(r=>r.name);
 
         const td = document.createElement("td");
-        td.className = "cell" + (allNames.length>0?" has-names":" zero");
+        td.className = "cell"+(allNames.length>0?" has-names":" zero");
         td.onclick = ()=>openCellModal(slotKey);
 
-        if(allNames.length === 0){
+        if(allNames.length===0){
           const dot = document.createElement("div");
           dot.className = "cell-dot"; dot.textContent = "·";
           td.appendChild(dot);
@@ -864,11 +762,9 @@ function renderGrid(){
           wrap.className = "cell-names";
           allNames.forEach(fullName=>{
             const isMatch = matchedNames.has(fullName);
-            // 토글 ON + 필터 있을 때: 매칭 안 되는 이름은 건너뜀
             if(hideEmpty && hasFilter && !isMatch) return;
-
             const short = fullName.replace(/\s*\(.*?\)\s*$/,"").trim();
-            const chip = document.createElement("div");
+            const chip  = document.createElement("div");
             chip.className = "name-chip";
             chip.textContent = short;
             if(classColor){
@@ -876,16 +772,11 @@ function renderGrid(){
               if(colorCls) chip.classList.add(colorCls);
             }
             if(hasFilter){
-              if(isMatch){
-                chip.classList.add("match");
-              } else {
-                chip.classList.add("dim");
-              }
+              chip.classList.add(isMatch ? "match" : "dim");
             }
             wrap.appendChild(chip);
           });
-          // 칩이 하나라도 있으면 has-names, 없으면 zero로 변경
-          if(wrap.children.length === 0){
+          if(wrap.children.length===0){
             td.className = "cell zero";
             const dot = document.createElement("div");
             dot.className = "cell-dot"; dot.textContent = "·";
@@ -894,10 +785,8 @@ function renderGrid(){
             td.appendChild(wrap);
           }
         }
-
         tr.appendChild(td);
       });
-
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
@@ -909,8 +798,8 @@ function renderGrid(){
 /* ════════════════
    셀 팝업
 ════════════════ */
-let cellModalKey = null;
-let cellModalSel = {}; // fullName → bool
+let cellModalKey  = null;
+let cellModalSel  = {};
 
 function openCellModal(slotKey){
   if(!getMyFullName()){
@@ -921,18 +810,17 @@ function openCellModal(slotKey){
   cellModalKey = slotKey;
   cellModalSel = {};
 
-  const parts = slotKey.split("_");
-  const dateObj = ALL_DATES.find(d=>d.key===parts[0]);
-  const mealObj = MEALS.find(m=>m.key===parts[1]);
+  const parts     = slotKey.split("_");
+  const dateObj   = ALL_DATES.find(d=>d.key===parts[0]);
+  const mealObj   = MEALS.find(m=>m.key===parts[1]);
   const dateLabel = dateObj ? dateObj.label.replace("\n"," ") : parts[0];
   const mealLabel = mealObj ? mealObj.short : parts[1];
 
   document.getElementById("cellModalTitle").textContent = dateLabel+" "+mealLabel+" 기도";
 
-  // 내 정보 자동 채우기
-  const myName = document.getElementById("myName").value.trim();
+  const myName  = document.getElementById("myName").value.trim();
   const myClass = document.getElementById("myClass").value;
-  document.getElementById("addName").value = myName;
+  document.getElementById("addName").value  = myName;
   document.getElementById("addClass").value = myClass;
 
   renderModalList();
@@ -943,59 +831,55 @@ function openCellModal(slotKey){
 function renderModalList(){
   const list = document.getElementById("cellModalList");
   list.innerHTML = "";
-
   cachedRows.forEach(row=>{
     const isChecked = cellModalSel.hasOwnProperty(row.name)
       ? cellModalSel[row.name]
       : (row.selections && row.selections[cellModalKey]==="O");
     cellModalSel[row.name] = isChecked;
-
-    const item = makeCheckItem(row.name, isChecked);
-    list.appendChild(item);
+    list.appendChild(makeCheckItem(row.name, isChecked));
   });
 }
 
 function makeCheckItem(fullName, isChecked){
-  const short = fullName.replace(/\s*\(.*?\)\s*$/,"").trim();
-  const cls   = (fullName.match(/\(([^)]+)\)/)||[])[1]||"";
+  const short      = fullName.replace(/\s*\(.*?\)\s*$/,"").trim();
+  const cls        = (fullName.match(/\(([^)]+)\)/)||[])[1]||"";
   const myFullName = getMyFullName();
-  const isMe = myFullName && fullName === myFullName;
-  // 관리자 → 전체 허용 / 본인 → 본인만 / 미설정 → 전체 허용
-  const canToggle = !myFullName || isAdmin() || isMe;
+  const isMe       = myFullName && fullName === myFullName;
+  const canToggle  = !myFullName || isAdmin() || isMe;
 
   const item = document.createElement("div");
   item.className = "cell-check-item"+(isChecked?" checked":"");
   if(!canToggle) item.classList.add("readonly");
   item.dataset.name = fullName;
 
-  const box = document.createElement("div");
-  box.className = "cell-check-box"; box.textContent = isChecked?"✓":"";
+  const box      = document.createElement("div");
+  box.className  = "cell-check-box";
+  box.textContent = isChecked?"✓":"";
 
-  const nameSpan = document.createElement("span");
-  nameSpan.className = "cell-check-name"; nameSpan.textContent = short;
+  const nameSpan      = document.createElement("span");
+  nameSpan.className  = "cell-check-name";
+  nameSpan.textContent = short;
 
-  const clsSpan = document.createElement("span");
-  clsSpan.className = "cell-check-class"; clsSpan.textContent = cls;
+  const clsSpan      = document.createElement("span");
+  clsSpan.className  = "cell-check-class";
+  clsSpan.textContent = cls;
 
-  // 잠금 아이콘 (다른 사람)
   if(!canToggle){
     const lockSpan = document.createElement("span");
     lockSpan.style.cssText = "font-size:11px;color:#ccc;margin-left:2px;";
     lockSpan.textContent = "🔒";
-    item.appendChild(box); item.appendChild(nameSpan); item.appendChild(clsSpan); item.appendChild(lockSpan);
+    item.append(box, nameSpan, clsSpan, lockSpan);
   } else {
-    item.appendChild(box); item.appendChild(nameSpan); item.appendChild(clsSpan);
+    item.append(box, nameSpan, clsSpan);
   }
 
   item.onclick = ()=>{
-    if(!canToggle){
-      showToast("본인 항목만 수정할 수 있습니다","error"); return;
-    }
+    if(!canToggle){ showToast("본인 항목만 수정할 수 있습니다","error"); return; }
     const next = !cellModalSel[fullName];
     cellModalSel[fullName] = next;
     item.classList.toggle("checked", next);
     box.textContent = next?"✓":"";
-    nameSpan.style.color = next?"var(--olive)":"";
+    nameSpan.style.color      = next?"var(--olive)":"";
     nameSpan.style.fontWeight = next?"600":"";
   };
   return item;
@@ -1005,17 +889,15 @@ function addNewPerson(){
   const name = document.getElementById("addName").value.trim();
   const cls  = document.getElementById("addClass").value;
   if(!name){ showToast("이름을 입력해 주세요","error"); return; }
-  if(!cls)  { showToast("반을 선택해 주세요","error"); return; }
+  if(!cls)  { showToast("반을 선택해 주세요","error");   return; }
 
-  const fullName = name+" ("+cls+")";
+  const fullName   = name+" ("+cls+")";
   const myFullName = getMyFullName();
 
-  // 일반 사용자는 본인만 추가 가능
   if(myFullName && !isAdmin() && fullName !== myFullName){
     showToast("본인 항목만 추가할 수 있습니다","error"); return;
   }
 
-  // cachedRows에 이미 있는 사람 → 목록에서 찾아 체크
   const existingRow = cachedRows.find(r=>r.name===fullName);
   if(existingRow){
     cellModalSel[fullName] = true;
@@ -1026,13 +908,11 @@ function addNewPerson(){
       item.querySelector(".cell-check-box").textContent = "✓";
       item.querySelector(".cell-check-name").style.color = "var(--olive)";
       item.querySelector(".cell-check-name").style.fontWeight = "600";
-      item.scrollIntoView({behavior:"smooth", block:"nearest"});
+      item.scrollIntoView({behavior:"smooth",block:"nearest"});
     }
-    showToast(name+"님 체크됨","success");
-    return;
+    showToast(name+"님 체크됨","success"); return;
   }
 
-  // 팝업 내 임시 추가된 사람 중복
   if(cellModalSel.hasOwnProperty(fullName)){
     cellModalSel[fullName] = true;
     const list = document.getElementById("cellModalList");
@@ -1041,18 +921,15 @@ function addNewPerson(){
       item.classList.add("checked");
       item.querySelector(".cell-check-box").textContent = "✓";
     }
-    showToast(name+"님 체크됨","success");
-    return;
+    showToast(name+"님 체크됨","success"); return;
   }
 
-  // 완전 신규 → 목록 맨 위에 추가
   cellModalSel[fullName] = true;
   const list = document.getElementById("cellModalList");
-  const item = makeCheckItem(fullName, true);
-  list.insertBefore(item, list.firstChild);
+  list.insertBefore(makeCheckItem(fullName, true), list.firstChild);
   showToast(name+"님 추가됨","success");
 
-  document.getElementById("addName").value = document.getElementById("myName").value.trim();
+  document.getElementById("addName").value  = document.getElementById("myName").value.trim();
   document.getElementById("addClass").value = document.getElementById("myClass").value;
 }
 
@@ -1069,9 +946,9 @@ async function saveCellModal(){
   if(!cellModalKey) return;
 
   const myFullName = getMyFullName();
-  const changed = [];
+  const changed    = [];
   Object.entries(cellModalSel).forEach(([fullName, isChecked])=>{
-    const row = cachedRows.find(r=>r.name===fullName);
+    const row        = cachedRows.find(r=>r.name===fullName);
     const wasChecked = row ? (row.selections&&row.selections[cellModalKey]==="O") : false;
     if(wasChecked === isChecked) return;
     if(myFullName && !isAdmin() && fullName !== myFullName && !isChecked) return;
@@ -1080,22 +957,16 @@ async function saveCellModal(){
 
   if(changed.length===0){ showToast("변경된 내용이 없습니다","error"); return; }
 
-  // 로컬 cachedRows 업데이트 (서버 전송 없음)
+  // 로컬 cachedRows 업데이트
   changed.forEach(({fullName, isChecked, row})=>{
     if(row){
       if(!row.selections) row.selections = {};
       row.selections[cellModalKey] = isChecked ? "O" : "";
     } else {
-      const newSelections = {};
-      ALL_DATES.forEach(d=>MEALS.forEach(m=>{
-        newSelections[d.key+"_"+m.key] = "";
-      }));
-      newSelections[cellModalKey] = "O";
-      cachedRows.push({
-        name: fullName,
-        timestamp: getTimestamp(),
-        selections: newSelections
-      });
+      const newSel = {};
+      ALL_DATES.forEach(d=>MEALS.forEach(m=>{ newSel[d.key+"_"+m.key] = ""; }));
+      newSel[cellModalKey] = "O";
+      cachedRows.push({ name:fullName, timestamp:getTimestamp(), selections:newSel });
     }
     markDirty(fullName);
   });
@@ -1113,17 +984,15 @@ function showLoading(msg){
   document.getElementById("loadingOverlay").classList.add("show");
 }
 function hideLoading(){ document.getElementById("loadingOverlay").classList.remove("show"); }
-function showToast(msg,type=""){
+function showToast(msg, type=""){
   const t = document.getElementById("toast");
   t.textContent = msg; t.className = "toast show "+type;
   clearTimeout(t._timer);
-  t._timer = setTimeout(()=>{t.className="toast";}, 3000);
+  t._timer = setTimeout(()=>{ t.className="toast"; }, 3000);
 }
-
 function getTimestamp(){
-  try{
-    return new Date().toLocaleString("ko-KR");
-  } catch(e){
+  try{ return new Date().toLocaleString("ko-KR"); }
+  catch(e){
     const d = new Date();
     return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()+" "+
            d.getHours()+":"+String(d.getMinutes()).padStart(2,"0");
@@ -1131,7 +1000,7 @@ function getTimestamp(){
 }
 
 // 초기 실행
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", ()=>{
   initTagSearch();
   loadData();
 });
