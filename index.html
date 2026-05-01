@@ -370,7 +370,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-se
 // ============================================================
 // ★ Apps Script 배포 URL
 // ============================================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPzw6RygMcNw8fqM6zORbsZ-wFFZN8_t2_kgRxzdATIbXR1N04po3vXTKOLpuhkHhAuQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzd_GtiqnBCecMuIzS7qzAtE998JQZn1NbBbrrlMIGO8BWJm1sIxeGdCygTpjsR3AN_9g/exec";
 // ============================================================
 
 // ============================================================
@@ -524,11 +524,8 @@ async function loadDataForUser(){
   if(!SCRIPT_URL){ renderGrid(); return; }
   showLoading("데이터 불러오는 중...");
   try{
-    const res = await fetch(SCRIPT_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ action:"read" }),
-    });
+    const url = SCRIPT_URL + "?action=read&t=" + Date.now();
+    const res = await fetch(url, { method:"GET", redirect:"follow" });
     const data = await res.json();
     if(data.status==="ok"){
       cachedRows = data.rows || [];
@@ -564,11 +561,13 @@ async function sendToSheet(){
       payload.action    = "save";        // Apps Script가 인식하는 액션
       payload.timestamp = getTimestamp(); // 최신 타임스탬프로 갱신
 
-      const res = await fetch(SCRIPT_URL, {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(payload)
-      });
+      const sendUrl = SCRIPT_URL
+        + "?action=save"
+        + "&name=" + encodeURIComponent(payload.name)
+        + "&timestamp=" + encodeURIComponent(payload.timestamp)
+        + "&selections=" + encodeURIComponent(JSON.stringify(payload.selections))
+        + "&t=" + Date.now();
+      const res = await fetch(sendUrl, { method:"GET", redirect:"follow" });
       const result = await res.json();
       if(result.status !== "ok") throw new Error(result.message || "오류");
     }
@@ -602,11 +601,8 @@ async function loadData(clearFilters=false){
   showLoading("불러오는 중...");
   try{
     // ★ 전체 취합: 모든 시트(수주반,분주반,화요반,교역자,기도후원자(OB)) 데이터를 한번에 읽어옴
-    const res = await fetch(SCRIPT_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ action:"read" }),
-    });
+    const readUrl = SCRIPT_URL + "?action=read&t=" + Date.now();
+    const res = await fetch(readUrl, { method:"GET", redirect:"follow" });
     const data = await res.json();
     if(data.status !== "ok") throw new Error(data.message || "오류");
     cachedRows = data.rows || [];
